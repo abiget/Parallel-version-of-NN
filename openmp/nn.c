@@ -14,23 +14,17 @@ static void backPropagate(Network* network, int label);
 static uint8_t getClassification(Layer* layer);
 
 void initNetwork(Network* network){
-    // printf("IM %d",IMAGE_SIZE);
-    // printf("network->inputLayer %d",*network->inputLayer);
-    // printf("HIDDEN_LAYER_SIZE %d",HIDDEN_LAYER_SIZE);
-    // printf("network->hiddenLayer %d",*network->hiddenLayer);
-    // printf("OUTPUT_SIZE %d",OUTPUT_SIZE);
+
     initLayer(IMAGE_SIZE, 0, &network->inputLayer);
     initLayer(HIDDEN_LAYER_SIZE, IMAGE_SIZE, &network->hiddenLayer);
     initLayer(OUTPUT_SIZE, HIDDEN_LAYER_SIZE, &network->outputLayer);
 }
 
 void trainNetwork(Network* network){
-    // printf("Inside");
     FILE *imageFile;
     FILE *labelFile;
     ImageFileHeader imageFileHeader;
     imageFile = openImageFile(TRAINING_SET_IMAGE_FILE_NAME, &imageFileHeader);
-    // printf("%s",TRAINING_SET_LABEL_FILE_NAME);
     labelFile = openLabelFile(TRAINING_SET_LABEL_FILE_NAME);
     // #pragma omp parallel for
     for(int i=0; i<imageFileHeader.maxImages; i++){
@@ -85,7 +79,6 @@ static void initLayer(int numberOfNodes, int numberOfWeights, Layer* layer){
 }
 
 static void initNode(int numberOfWeights, Node* node){
-    //Initialize weights between -0.7 and 0.7
     double* weights = malloc(numberOfWeights * sizeof(double));
     // #pragma omp parallel for
     for(int w=0; w<numberOfWeights; ++w){

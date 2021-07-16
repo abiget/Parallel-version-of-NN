@@ -1,12 +1,14 @@
 #include "nn.h"
-#include <omp.h>
+// #include <omp.h>
 #include<time.h>
 int main()
 {
 	// srand( static_cast<unsigned int>(time(NULL)));
-    srand( (unsigned int) time(NULL) );
-	float start,stop;
-	start = omp_get_wtime();
+    // srand( (unsigned int) time(NULL) );
+	time_t start,end;
+	// float start,stop;
+
+    start = time(NULL);
     Network network;
     initNetwork(&network);
 
@@ -16,9 +18,13 @@ int main()
         printf("Training epoch %i/%i\n", i + 1, TRAINING_EPOCHS);
         trainNetwork(&network);
         testNetwork(&network);
+    end = time(NULL);
+    printf("\nTime Elapsed for %i =%ld \n",i+1,end -start);
+
     }
-    stop = omp_get_wtime();
-    float elapse=stop-start;
-    printf("\nTime Elapsed=%f",elapse );
+    end = time(NULL);
+    // stop = omp_get_wtime();
+    // float elapse=stop-start;
+    printf("\nTime Elapsed=%ld",end -start);
     return 0;
 }

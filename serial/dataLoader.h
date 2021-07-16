@@ -24,6 +24,3 @@ FILE* openImageFile(char *fileName, ImageFileHeader* imageFileHeader);
 FILE* openLabelFile(char *fileName);
 
 
-//Image struct mei pura array image ka
-//image Header mei width,height and no of images 
-//label file header mei max label

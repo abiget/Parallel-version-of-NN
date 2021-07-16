@@ -2,4 +2,4 @@
 - try the serial implementation
 - implement openmp
 - implement MPI
-- implement pthrea
+- implement pthread

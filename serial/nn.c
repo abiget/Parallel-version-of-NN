@@ -74,7 +74,7 @@ void testNetwork(Network *network){
 
 static void initLayer(int numberOfNodes, int numberOfWeights, Layer* layer){
     Node* nodes = malloc(numberOfNodes * sizeof(Node));
-    // #pragma omp parallel for 
+    // #pragma omp parallel for
     for(int hn=0; hn<numberOfNodes; ++hn){
         Node* node = &nodes[hn];
         initNode(numberOfWeights, node);
@@ -149,7 +149,6 @@ static void updateNode(Layer* previousLayer, double backPropValue, Node* node){
 }
 
 static void backPropagate(Network* network, int label){
-    // #pragma omp barrier
     Layer* hiddenLayer = &network->hiddenLayer;
     Layer* outputLayer = &network->outputLayer;
     // #pragma omp parallel for

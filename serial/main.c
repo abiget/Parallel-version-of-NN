@@ -22,7 +22,7 @@ int main()
 {
 	// srand( static_cast<unsigned int>(time(NULL)));
     // srand( (unsigned int) time(NULL) );
-	float start,stop;
+	double start,stop;
 	start = getTime();
     Network network;
     initNetwork(&network);
@@ -39,7 +39,6 @@ int main()
     }
     stop = getTime();
     float serialTime= stop-start;
-    printf("Serial Implementation of NN\n");
-    printf("\nTime Elapsed=%f",serialTime );
+    printf("\nTime Elapsed in serial =%f",serialTime );
     return 0;
 }

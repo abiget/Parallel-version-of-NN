@@ -25,6 +25,7 @@ void initNetwork(Network* network){
 }
 
 void trainNetwork(Network* network){
+//TODO: we should implement the mpi init in here
     // printf("Inside");
     FILE *imageFile;
     FILE *labelFile;

@@ -81,7 +81,7 @@ static void initLayer(int numberOfNodes, int numberOfWeights, Layer* layer){
 static void initNode(int numberOfWeights, Node* node){
     //Initialize weights between -0.7 and 0.7
     double* weights = malloc(numberOfWeights * sizeof(double));
-    //#pragma omp parallel for
+    // #pragma omp parallel for
     for(int w=0; w<numberOfWeights; ++w){
         weights[w] = 0.7 * (rand()/(double)(RAND_MAX));
         if (w%2){
@@ -108,7 +108,7 @@ static void feedForwardLayer(Layer* previousLayer, Layer* layer){
             Node* node = &layer->nodes[hn];
             node->output = node->bias;
             float temp=node->bias;
-            #pragma omp parallel for reduction(+: temp)
+            // #pragma omp parallel for reduction(+: temp)
             for(int w=0; w<previousLayer->numberOfNodes; ++w){
                 temp += previousLayer->nodes[w].output * node->weights[w];
             }
@@ -131,7 +131,7 @@ static void feedForward(Network* network, Image* img){
 }
 
 static void updateNode(Layer* previousLayer, double backPropValue, Node* node){
-    // #pragma omp parallel for schedule(static, 2)
+    // #pragma omp parallel for 
     for(int hn=0; hn<previousLayer->numberOfNodes; ++hn){
         Node* previousLayerNode = &previousLayer->nodes[hn];
         node->weights[hn] += LEARNING_RATE * previousLayerNode->output * backPropValue;

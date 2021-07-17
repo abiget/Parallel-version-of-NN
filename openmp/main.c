@@ -20,13 +20,18 @@ double getTime()
 int main()
 {
 	// srand( static_cast<unsigned int>(time(NULL)));
-    // srand( (unsigned int) time(NULL) );
+  //   srand( (unsigned int) time(NULL) );
+	// float start,stop;
+	// start = omp_get_wtime();
+  // omp_set_nested(0);
 	double start,stop;
 	start = getTime();
+
     Network network;
     initNetwork(&network);
     
     testNetwork(&network);
+    printf("%d\n\n",omp_get_max_threads());
     // #pragma omp parallel for
     for(int i=0; i<TRAINING_EPOCHS; ++i){
         printf("Training epoch %i/%i\n", i + 1, TRAINING_EPOCHS);

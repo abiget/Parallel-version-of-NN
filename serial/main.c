@@ -33,6 +33,9 @@ int main()
         printf("Training epoch %i/%i\n", i + 1, TRAINING_EPOCHS);
         trainNetwork(&network);
         testNetwork(&network);
+    // end = time(NULL);
+    // printf("\nTime Elapsed for %i =%ld \n",i+1,end -start);
+
     }
     stop = getTime();
     double serialTime= stop-start;

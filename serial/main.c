@@ -38,7 +38,8 @@ int main()
 
     }
     stop = getTime();
-    float serialTime= stop-start;
-    printf("\nTime Elapsed in serial =%f",serialTime );
+    double serialTime= stop-start;
+    printf("Serial Implementation of NN\n");
+    printf("\nTime Elapsed=%f",serialTime );
     return 0;
 }

@@ -1,9 +1,9 @@
 #include "nn.h"
 #include <omp.h>
-#include<time.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/time.h>
+// #include<time.h>
 double getTime()
 {
   const double kMicro = 1.0e-6;
@@ -29,7 +29,7 @@ int main()
 
     Network network;
     initNetwork(&network);
-
+    
     testNetwork(&network);
     printf("%d\n\n",omp_get_max_threads());
     // #pragma omp parallel for
@@ -38,11 +38,9 @@ int main()
         trainNetwork(&network);
         testNetwork(&network);
     }
-    // stop = omp_get_wtime();
-    // float elapse=stop-start;
     stop = getTime();
-    double serialTime= stop-start;
-    printf("\nTime Elapsed=%f",serialTime );
-    //  printf("\nTime Elapsed=%f",elapse );
+    double parallelTime= stop-start;
+    printf("Parallel Implementation of NN\n");
+    printf("\nTime Elapsed=%f",parallelTime );
     return 0;
 }

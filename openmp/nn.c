@@ -7,22 +7,19 @@ static void initLayer(int numberOfNodes, int numberOfWeights, Layer *layer);
 static void initNode(int numberOfWeights, Node *node);
 static double sigmoid(double value);
 static double sigmoidDerivative(double nodeOutput);
-static void feedForwardLayer(Layer *previousLayer, Layer *layer);
-static void feedForward(Network *network, Image *img);
-static void updateNode(Layer *previousLayer, double backPropValue, Node *node);
-static void backPropagate(Network *network, int label);
-static uint8_t getClassification(Layer *layer);
+static void feedForwardLayer(Layer* previousLayer, Layer* layer);
+static void feedForward(Network* network, Image* img);
+static void updateNode(Layer* previousLayer, double backPropValue, Node* node);
+static void backPropagate(Network* network, int label);
+static uint8_t getClassification(Layer* layer);
 
-void initNetwork(Network *network)
-{
-
+void initNetwork(Network* network){
     initLayer(IMAGE_SIZE, 0, &network->inputLayer);
     initLayer(HIDDEN_LAYER_SIZE, IMAGE_SIZE, &network->hiddenLayer);
     initLayer(OUTPUT_SIZE, HIDDEN_LAYER_SIZE, &network->outputLayer);
 }
 
-void trainNetwork(Network *network)
-{
+void trainNetwork(Network* network){
     FILE *imageFile;
     FILE *labelFile;
     ImageFileHeader imageFileHeader;
@@ -39,6 +36,7 @@ void trainNetwork(Network *network)
 
         backPropagate(network, label);
     }
+  
 }
 
 void testNetwork(Network *network)
@@ -72,13 +70,11 @@ void testNetwork(Network *network)
     printf("Test Accuracy: %0.2f%%\n", ((double)(imageFileHeader.maxImages - errCount) / imageFileHeader.maxImages) * 100);
 }
 
-static void initLayer(int numberOfNodes, int numberOfWeights, Layer *layer)
-{
-    Node *nodes = malloc(numberOfNodes * sizeof(Node));
-#pragma omp parallel for
-    for (int hn = 0; hn < numberOfNodes; ++hn)
-    {
-        Node *node = &nodes[hn];
+static void initLayer(int numberOfNodes, int numberOfWeights, Layer* layer){
+    Node* nodes = malloc(numberOfNodes * sizeof(Node));
+    #pragma omp parallel for schedule(static)
+    for(int hn=0; hn<numberOfNodes; ++hn){
+        Node* node = &nodes[hn];
         initNode(numberOfWeights, node);
     }
 
@@ -116,8 +112,6 @@ static double sigmoidDerivative(double nodeOutput)
 
 static void feedForwardLayer(Layer *previousLayer, Layer *layer)
 {
-    // #pragma omp parallel
-    // {
 
     for (int hn = 0; hn < layer->numberOfNodes; ++hn)
     {
@@ -133,13 +127,11 @@ static void feedForwardLayer(Layer *previousLayer, Layer *layer)
         node->output = sigmoid(temp);
     }
 }
-// }
 
-static void feedForward(Network *network, Image *img)
-{
-//fill the input layer with normalized input
-#pragma omp parallel for
-    for (int i = 0; i < IMAGE_SIZE; ++i)
+static void feedForward(Network* network, Image* img){
+    //Populate the input layer with normalized input
+    #pragma omp parallel for schedule(static)
+    for(int i=0; i<IMAGE_SIZE; ++i)
     {
         network->inputLayer.nodes[i].output = (double)(img->pixels[i] / 255.0);
     }
@@ -162,12 +154,11 @@ static void updateNode(Layer *previousLayer, double backPropValue, Node *node)
 static void backPropagate(Network *network, int label)
 {
     // #pragma omp barrier
-    Layer *hiddenLayer = &network->hiddenLayer;
-    Layer *outputLayer = &network->outputLayer;
-#pragma omp parallel for
-    for (int on = 0; on < outputLayer->numberOfNodes; ++on)
-    {
-        Node *outputNode = &outputLayer->nodes[on];
+    Layer* hiddenLayer = &network->hiddenLayer;
+    Layer* outputLayer = &network->outputLayer;
+    #pragma omp parallel for schedule(static, 1)
+    for(int on=0; on<outputLayer->numberOfNodes; ++on){
+        Node* outputNode = &outputLayer->nodes[on];
 
         int nodeTarget = (on == label) ? 1 : 0;
         double errorDelta = nodeTarget - outputNode->output;
@@ -176,10 +167,9 @@ static void backPropagate(Network *network, int label)
         outputNode->backPropValue = backPropValue;
         updateNode(&network->hiddenLayer, outputNode->backPropValue, outputNode);
     }
-#pragma omp parallel for
-    for (int hn = 0; hn < hiddenLayer->numberOfNodes; ++hn)
-    {
-        Node *hiddenNode = &hiddenLayer->nodes[hn];
+    #pragma omp parallel for schedule(static, 1)
+    for(int hn=0; hn<hiddenLayer->numberOfNodes; ++hn){
+        Node* hiddenNode = &hiddenLayer->nodes[hn];
 
         double outputNodesBackPropSum = 0;
 
@@ -198,15 +188,13 @@ static uint8_t getClassification(Layer *layer)
 {
     double maxOutput = 0;
     int maxIndex = 0;
-
-    for (int on = 0; on < layer->numberOfNodes; ++on)
-    {
-        double nodeOutput = layer->nodes[on].output;
-        if (nodeOutput > maxOutput)
-        {
-            maxOutput = nodeOutput;
-            maxIndex = on;
+    #pragma omp parallel for
+        for(int on=0; on<layer->numberOfNodes; ++on){
+            double nodeOutput = layer->nodes[on].output;
+            if(nodeOutput > maxOutput){
+                maxOutput = nodeOutput;
+                maxIndex = on;
+            }
         }
-    }
     return (uint8_t)maxIndex;
 }

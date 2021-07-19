@@ -17,7 +17,7 @@ static uint8_t getClassification(Layer* layer);
 
 void initNetwork(Network* network){
     // printf("IM %d",IMAGE_SIZE);
-    // printf("network->inputLayer %d",*network->inputLayer);
+    printf("network->inputLayer %d",*network->inputLayer);
     // printf("HIDDEN_LAYER_SIZE %d",HIDDEN_LAYER_SIZE);
     // printf("network->hiddenLayer %d",*network->hiddenLayer);
     // printf("OUTPUT_SIZE %d",OUTPUT_SIZE);

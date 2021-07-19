@@ -1,6 +1,8 @@
 #include "dataLoader.h"
 #include "config.h"
-
+// #if !defined()
+// #include "../mnist.h"
+// #endif
 typedef struct Node_{
     double bias;
     double output;
@@ -29,5 +31,5 @@ typedef struct ThreadInfo_{
 }ThreadInfo;
 
 void initNetworks(Networks* network);
-void * trainNetwork(ThreadInfo* threadInfo);
+void * trainNetwork(void *myThreadInfo);
 // void testNetwork(Networks *network);

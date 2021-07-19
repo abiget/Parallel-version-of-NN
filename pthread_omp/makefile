@@ -1,5 +1,5 @@
 all: main
 
 main: 
-	gcc -o nn.out main.c nn.c dataLoader.c -lm -fopenmp
+	gcc -pthread -fopenmp main.c -o nn  nn.c dataLoader.c mnist.c  -lm
 

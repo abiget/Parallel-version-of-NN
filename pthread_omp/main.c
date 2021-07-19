@@ -3,7 +3,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/time.h>
+#include "pthread.h"
 // #include<time.h>
+#include "mnist.h"
 double getTime()
 {
   const double kMicro = 1.0e-6;
@@ -17,25 +19,27 @@ double getTime()
   }
   return (((double)TV.tv_sec) + kMicro * ((double)TV.tv_usec));
 }
-void collect_av_parameters(ThreadInfo *params[],Network * final){
+void collect_av_parameters(ThreadInfo *params[], Network *final)
+{
   //something
-  
-  for (int j = 1; j < NUM_THREADS; j++){
-      #pragma omp parallel for
-      {
-      for(int k = 0; k< IMAGE_SIZE; k++)
-        *params[0]->network.inputLayer.nodes[k].weights += *params[j]->network.inputLayer.nodes[k].weights; 
-      for(int k = 0; k< HIDDEN_LAYER_SIZE; k++)
-        *params[0]->network.hiddenLayer.nodes[k].weights += *params[j]->network.hiddenLayer.nodes[k].weights;
-      for(int k = 0; k< OUTPUT_SIZE; k++)
-        *params[0]->network.outputLayer.nodes[k].weights += *params[j]->network.outputLayer.nodes[k].weights;
-      }
+
+  for (int j = 1; j < NUM_THREADS; j++)
+  {
+#pragma omp parallel for
+    for (int k = 0; k < IMAGE_SIZE; k++)
+      *params[0]->network.inputLayer.nodes[k].weights += *params[j]->network.inputLayer.nodes[k].weights;
+#pragma omp parallel for
+    for (int k = 0; k < HIDDEN_LAYER_SIZE; k++)
+      *params[0]->network.hiddenLayer.nodes[k].weights += *params[j]->network.hiddenLayer.nodes[k].weights;
+#pragma omp parallel for
+    for (int k = 0; k < OUTPUT_SIZE; k++)
+      *params[0]->network.outputLayer.nodes[k].weights += *params[j]->network.outputLayer.nodes[k].weights;
   }
-  for(int k = 0; k< IMAGE_SIZE; k++)
-    *params[0]->network.inputLayer.nodes[k].weights /= NUM_THREADS; 
-  for(int k = 0; k< HIDDEN_LAYER_SIZE; k++)
+  for (int k = 0; k < IMAGE_SIZE; k++)
+    *params[0]->network.inputLayer.nodes[k].weights /= NUM_THREADS;
+  for (int k = 0; k < HIDDEN_LAYER_SIZE; k++)
     *params[0]->network.hiddenLayer.nodes[k].weights /= NUM_THREADS;
-  for(int k = 0; k< OUTPUT_SIZE; k++)
+  for (int k = 0; k < OUTPUT_SIZE; k++)
     *params[0]->network.outputLayer.nodes[k].weights /= NUM_THREADS;
   final = &params[0]->network;
   free(params);
@@ -55,38 +59,41 @@ int main()
   initNetworks(&networks);
 
   Network final; //will get back
-  // testNetwork(&network);//will get back
-  // printf("%d\n\n",omp_get_max_threads());
+  testNetwork(&final);//will get back
+  printf("%d\n\n", omp_get_max_threads());
 
-  int iterationsPerThread = 60000 / NUM_THREADS;
+  int iterationsPerThread = 10000 / NUM_THREADS;
   pthread_t *threads = (pthread_t *)malloc(sizeof(pthread_t) * NUM_THREADS);
   ThreadInfo *paramArray[NUM_THREADS];
+  ThreadInfo *param = (ThreadInfo *)malloc(sizeof(ThreadInfo));
 
   // #pragma omp parallel for
   for (int i = 0; i < TRAINING_EPOCHS; ++i)
   {
     printf("Training epoch %i/%i\n", i + 1, TRAINING_EPOCHS);
+         
     for (int j = 0; j < NUM_THREADS; j++)
-    {
-      ThreadInfo *param = (ThreadInfo *)malloc(sizeof(ThreadInfo));
+    { 
+      printf("hereeeeeeeeee2222");
       param->start = j * iterationsPerThread;
-      param->end = param->start + iterationsPerThread;
+      param->end = j * (iterationsPerThread + 1);
+
       param->network = networks.network[j];
       paramArray[j] = param;
+
       pthread_create(&threads[j], NULL, trainNetwork, (void *)param);
     }
     for (int j = 0; j < NUM_THREADS; j++)
-      pthread_join(&threads[j], NULL);
+      pthread_join(threads[j], NULL);
     //---------------------------------------------Collector
     //pgram
-    
-      collect_av_parameters(paramArray, &final);
-      testNetwork(&final);
+
+    collect_av_parameters(paramArray, &final);
+    testNetwork(final);
 
     //---------------------------------------------
 
     // trainNetwork(&networks);
-
   }
   stop = getTime();
   double parallelTime = stop - start;

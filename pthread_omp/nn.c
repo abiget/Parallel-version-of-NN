@@ -36,11 +36,12 @@ void initNetwork(Network *network)
 }
 
 void * trainNetwork(void *myThreadInfo)
-{ 
+{   
     ThreadInfo *myThread = (ThreadInfo *)myThreadInfo;
     Network * myNetwork = myThread->network;
     int myStart = myThread->start;
     int myEnd = myThread->end;
+    // printf("My start : %d\n",myStart);
     // FILE *imageFile;
     // FILE *labelFile;
     // ImageFileHeader imageFileHeader;

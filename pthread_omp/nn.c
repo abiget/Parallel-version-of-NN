@@ -3,7 +3,7 @@
 #include <stdio.h>
 #include <math.h>
 #include "mnist.h"
-static void initNetwork(Network *network);
+// static void initNetwork(Network *network);
 static void initLayer(int numberOfNodes, int numberOfWeights, Layer *layer);
 static void initNode(int numberOfWeights, Node *node);
 static double sigmoid(double value);
@@ -16,12 +16,14 @@ static uint8_t getClassification(Layer *layer);
 
 void initNetworks(Networks *networks)
 {   
-    Network *ntks = malloc(NUM_THREADS * sizeof(Network));
-    for (int hn = 0; hn < NUM_THREADS; ++hn)
+    Network *ntks = malloc(NUM_THREADS + 1* sizeof(Network));
+    for (int hn = 0; hn < NUM_THREADS + 1; ++hn)
     {
         Network *ntk = &ntks[hn];
         initNetwork(ntk);
+
     }
+        networks->network = ntks;
 // #pragma omp parallel for
 //     for (int i = 0; i < NUM_THREADS; i++)
 //         initNetwork(&networks->network[i]);
@@ -34,28 +36,29 @@ void initNetwork(Network *network)
 }
 
 void * trainNetwork(void *myThreadInfo)
-{   printf("hereeeeeeeeee");
+{ 
     ThreadInfo *myThread = (ThreadInfo *)myThreadInfo;
-    Network *myNetwork = &myThread->network;
+    Network * myNetwork = myThread->network;
     int myStart = myThread->start;
     int myEnd = myThread->end;
-
     // FILE *imageFile;
     // FILE *labelFile;
     // ImageFileHeader imageFileHeader;
     // imageFile = openImageFile(TRAINING_SET_IMAGE_FILE_NAME, &imageFileHeader);
     // labelFile = openLabelFile(TRAINING_SET_LABEL_FILE_NAME);
 
-    for (int i = myStart; i < myEnd; i++)
+    for (int q = myStart; q < myEnd; q++)
     {
         // Image img;
         // getImage(imageFile, &img);
         // uint8_t label = getLabel(labelFile);
 
-        feedForward(myNetwork, i,1); //
-
-        backPropagate(myNetwork, i);
+        feedForward(myNetwork, q,1);
+        backPropagate(myNetwork, q);
+        // printf(" ");
     }
+    // pthread_exit(NULL);
+
 }
 
 void testNetwork(Network *network)
@@ -70,15 +73,15 @@ void testNetwork(Network *network)
     // #pragma omp parallel for
     // #pragma omp barrier
     // #pragma omp parallel for
-    for (int i = 0; i < 10000; i++)
+    for (int test = 0; test < 10000; test++)
     {
         // Image img;
         // getImage(imageFile, &img);
         // uint8_t lbl = getLabel(labelFile);
-        feedForward(network, i,0);
+        feedForward(network, test,0);
 
         uint8_t classification = getClassification(&network->outputLayer);
-        if (classification != test_label[i])
+        if (classification != test_label[test])
         {
             errCount++;
         }
@@ -86,18 +89,18 @@ void testNetwork(Network *network)
     // fclose(imageFile);
     // fclose(labelFile);
 
-    printf("Test Accuracy: %0.2f%%\n", ((double)(60000 - errCount) / 60000) * 100);
+    printf("Test Accuracy: %0.2f%%\n", ((double)(10000 - errCount) / 10000) * 100);
 }
 
 static void initLayer(int numberOfNodes, int numberOfWeights, Layer *layer)
 {
     Node *nodes = malloc(numberOfNodes * sizeof(Node));
-#pragma omp parallel for schedule(static)
-    for (int hn = 0; hn < numberOfNodes; ++hn)
-    {
-        Node *node = &nodes[hn];
-        initNode(numberOfWeights, node);
-    }
+    #pragma omp parallel for schedule(static)
+        for (int hn = 0; hn < numberOfNodes; ++hn)
+        {
+            Node *node = &nodes[hn];
+            initNode(numberOfWeights, node);
+        }
 
     layer->numberOfNodes = numberOfNodes;
     layer->nodes = nodes;
@@ -154,17 +157,14 @@ static void feedForward(Network *network, int var, int train)
     //Populate the input layer with normalized input
     // #pragma omp parallel for schedule(static)
 
-    if (train==1)
-        for (int i = 0; i < IMAGE_SIZE; ++i)
-        {
-            network->inputLayer.nodes[i].output = (double)(train_image[var][i] / 255.0);
-        }
-    else
-    {
-        for (int i = 0; i < IMAGE_SIZE; ++i)
-        {
-            network->inputLayer.nodes[i].output = (double)(test_image[var][i] / 255.0);
-        }
+    if (train==1){
+        for (int b = 0; b < IMAGE_SIZE; ++b)
+            network->inputLayer.nodes[b].output = (double)(train_image[var][b] / 255.0);
+    }
+
+    else{
+        for (int b = 0; b < IMAGE_SIZE; ++b)
+            network->inputLayer.nodes[b].output = (double)(test_image[var][b] / 255.0);
     }
 
     feedForwardLayer(&network->inputLayer, &network->hiddenLayer);

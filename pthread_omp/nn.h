@@ -25,11 +25,12 @@ typedef struct Networks_{
     int numberOfNetworks;
     Network * network;
 } Networks;
-typedef struct ThreadInfo_{
-    Network network;
+typedef struct threadInfo_{
+    Network * network;
     int start, end;
 }ThreadInfo;
 
-void initNetworks(Networks* network);
+void initNetworks(Networks* networks);
+void initNetwork(Network * network);
 void * trainNetwork(void *myThreadInfo);
-// void testNetwork(Networks *network);
+void testNetwork(Network *network);

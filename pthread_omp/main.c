@@ -88,11 +88,10 @@ int main()
   Network final;
   initNetwork(&final);
 
-  // Network final = networks.network [NUM_THREADS];
   testNetwork(&final); //will get back
   printf("%d\n\n", omp_get_num_threads());
 
-  int iterationsPerThread = 20000 / NUM_THREADS;
+  int iterationsPerThread = 10000 / NUM_THREADS;
   pthread_t *threads = (pthread_t *)malloc(sizeof(pthread_t) * NUM_THREADS);
   ThreadInfo *paramArray[NUM_THREADS];
   int rc;
@@ -131,12 +130,19 @@ int main()
     // for(int nt = 0; nt<NUM_THREADS; nt++)
     // printf("\n\n weight:  %f,%f",*paramArray[0]->network->hiddenLayer.nodes[32].weights,s/12);
     // *paramArray[0]->network->hiddenLayer.nodes[1].weights+=*paramArray[0]->network->hiddenLayer.nodes[1].weights;
-    // printf("\n\n weight: %f, %f", paramArray[0]->network->hiddenLayer.nodes[32].weights[0],s/12);
+    printf("\n\n weight: %f, %f", paramArray[0]->network->hiddenLayer.nodes[32].weights[0], s / 12);
     // paramArray[0]->network->hiddenLayer.nodes[1].weights[1] += 10;
     // printf("\n\n weight:  %f", paramArray[0]->network->hiddenLayer.nodes[1].weights[1]);
 
     for (int nt = 0; nt < NUM_THREADS; nt++)
-      networks.network[nt] = final;
+    {
+      Network * ptr = &networks.network[nt];
+      ptr = paramArray[0]->network;
+    }
+    // networks.network[nt] = *paramArray[0]->network;
+    printf("\t after broadcast: %f\n", networks.network[0].hiddenLayer.nodes[32].weights[0]);
+
+    // networks.network[nt] = *paramArray[nt]->network;
     //   int h =0;
     // for(int nt = 0; nt<64; nt++)
     //   if(*paramArray[0]->network->hiddenLayer.nodes[nt].weights>0.5)
@@ -144,7 +150,7 @@ int main()
     // printf("\nnun empty number is :%d",h);
 
     //---------------------------------------------
-    testNetwork(&final);
+    testNetwork(paramArray[0]->network);
 
     // trainNetwork(&networks);
   }

@@ -70,6 +70,8 @@ void testNetwork(Network *network){
     fclose(labelFile);
 
     printf("Test Accuracy: %0.2f%%\n", ((double)(imageFileHeader.maxImages - errCount) / imageFileHeader.maxImages) * 100);
+    printf("\n%d\n",(int)imageFileHeader.maxImages );
+
 }
 
 static void initLayer(int numberOfNodes, int numberOfWeights, Layer* layer){

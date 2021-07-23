@@ -16,8 +16,8 @@ static uint8_t getClassification(Layer *layer);
 
 void initNetworks(Networks *networks)
 {   
-    Network *ntks = malloc(NUM_THREADS + 1* sizeof(Network));
-    for (int hn = 0; hn < NUM_THREADS + 1; ++hn)
+    Network *ntks = malloc(NUM_THREADS * sizeof(Network));
+    for (int hn = 0; hn < NUM_THREADS ; ++hn)
     {
         Network *ntk = &ntks[hn];
         initNetwork(ntk);
@@ -47,7 +47,7 @@ void * trainNetwork(void *myThreadInfo)
     // ImageFileHeader imageFileHeader;
     // imageFile = openImageFile(TRAINING_SET_IMAGE_FILE_NAME, &imageFileHeader);
     // labelFile = openLabelFile(TRAINING_SET_LABEL_FILE_NAME);
-
+    
     for (int q = myStart; q < myEnd; q++)
     {
         // Image img;
@@ -82,14 +82,14 @@ void testNetwork(Network *network)
         feedForward(network, test,0);
 
         uint8_t classification = getClassification(&network->outputLayer);
-        if (classification != test_label[test])
+        if (classification != (uint8_t)test_label[test])
         {
             errCount++;
         }
     }
     // fclose(imageFile);
     // fclose(labelFile);
-
+    printf("Test failed result: %d\n",errCount);
     printf("Test Accuracy: %0.2f%%\n", ((double)(10000 - errCount) / 10000) * 100);
 }
 

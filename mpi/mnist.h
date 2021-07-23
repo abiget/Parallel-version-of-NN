@@ -8,6 +8,7 @@ https://github.com/takafumihoriuchi/MNIST_for_C
 #include <unistd.h>
 #include <fcntl.h>
 #include <string.h>
+#include "mnist.h"
 
 // set appropriate path for data
 #define TRAIN_IMAGE "train-images-idx3-ubyte"

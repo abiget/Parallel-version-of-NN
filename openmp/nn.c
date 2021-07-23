@@ -118,7 +118,7 @@ static void feedForwardLayer(Layer *previousLayer, Layer *layer)
         Node *node = &layer->nodes[hn];
         node->output = node->bias;
         float temp = node->bias;
-        // #pragma omp parallel for reduction(+: temp)
+        #pragma omp parallel for reduction(+: temp)
         for (int w = 0; w < previousLayer->numberOfNodes; ++w)
         {
             temp += previousLayer->nodes[w].output * node->weights[w];

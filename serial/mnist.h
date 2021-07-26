@@ -15,7 +15,6 @@ https://github.com/takafumihoriuchi/MNIST_for_C
 #define TEST_IMAGE "../data/t10k-images-idx3-ubyte"
 #define TEST_LABEL "../data/t10k-labels-idx1-ubyte"
 
-
 #define SIZE 784 // 28*28
 #define NUM_TRAIN 60000
 #define NUM_TEST 10000

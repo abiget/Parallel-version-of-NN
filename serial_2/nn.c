@@ -41,7 +41,7 @@ void trainNetwork(Network *network)
         // Image img;
         // getImage(imageFile, &img);
         // uint8_t label = getLabel(labelFile);
-        int size = 60000;
+        // int size = 60000;
         feedForward(network, i,1);
 
         backPropagate(network, i);
@@ -150,13 +150,13 @@ static void feedForward(Network *network, int id, int train)
     if (train == 1)
     {
         for (int b = 0; b < IMAGE_SIZE; ++b)
-            network->inputLayer.nodes[b].output = (double)(train_image[id][b] / 255.0);
+            network->inputLayer.nodes[b].output = (train_image[id][b] );
     }
 
     else
     {
         for (int b = 0; b < IMAGE_SIZE; ++b)
-            network->inputLayer.nodes[b].output = (double)(test_image[id][b] / 255.0);
+            network->inputLayer.nodes[b].output = (test_image[id][b]);
     }
 
     feedForwardLayer(&network->inputLayer, &network->hiddenLayer);

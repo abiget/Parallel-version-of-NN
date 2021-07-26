@@ -1,5 +1,5 @@
 #include "nn.h"
-#include <omp.h>
+// #include <omp.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/time.h>
@@ -21,7 +21,7 @@ double getTime()
   return (((double)TV.tv_sec) + kMicro * ((double)TV.tv_usec));
 }
 
-void collect_av_parameters(ThreadInfo *params[], Network *final)
+void collect_av_parameters(ThreadInfo *params[])
 {
   //something
 
@@ -42,6 +42,8 @@ void collect_av_parameters(ThreadInfo *params[], Network *final)
     // #pragma omp parallel for
     //-----------------------------------------------------------
     // //hidden layer
+
+
     for (int k = 0; k < HIDDEN_LAYER_SIZE; k++)
       for (int input = 0; input < IMAGE_SIZE; input++)
         params[0]->network->hiddenLayer.nodes[k].weights[input] += params[j]->network->hiddenLayer.nodes[k].weights[input];
@@ -50,6 +52,8 @@ void collect_av_parameters(ThreadInfo *params[], Network *final)
     for (int k = 0; k < OUTPUT_SIZE; k++)
       for (int input = 0; input < HIDDEN_LAYER_SIZE; input++)
         params[0]->network->outputLayer.nodes[k].weights[input] += params[j]->network->outputLayer.nodes[k].weights[input];
+    
+    
     // dealing with the unused paprameters, shit !
     //-------------------------------------------------------------------
     // for (int k = 0; k < IMAGE_SIZE; k++)
@@ -65,7 +69,7 @@ void collect_av_parameters(ThreadInfo *params[], Network *final)
   for (int k = 0; k < OUTPUT_SIZE; k++)
     for (int input = 0; input < HIDDEN_LAYER_SIZE; input++)
       params[0]->network->outputLayer.nodes[k].weights[input] /= NUM_THREADS;
-  final = params[0]->network;
+  // final = params[0]->network;
 }
 void *printer(void *value)
 {
@@ -85,13 +89,13 @@ int main()
   start = getTime();
   Networks networks;
   initNetworks(&networks);
-  Network final;
-  initNetwork(&final);
+  // Network final;
+  // initNetwork(&final);
 
-  testNetwork(&final); //will get back
-  printf("%d\n\n", omp_get_num_threads());
+  testNetwork(&networks.network[0]); //will get back
+  // printf("%d\n\n", omp_get_num_threads());
 
-  int iterationsPerThread = 10000 / NUM_THREADS;
+  int iterationsPerThread = 60000 / NUM_THREADS;
   pthread_t *threads = (pthread_t *)malloc(sizeof(pthread_t) * NUM_THREADS);
   ThreadInfo *paramArray[NUM_THREADS];
   int rc;
@@ -99,14 +103,16 @@ int main()
   // #pragma omp parallel for
   for (int i = 0; i < 10; ++i)
   {
-    // printf("Training epoch %i/%i \t:", i + 1, TRAINING_EPOCHS);
+    printf("Training epoch %i/%i \t:", i + 1, TRAINING_EPOCHS);
 
     for (int j = 0; j < NUM_THREADS; j++)
     {
       ThreadInfo *param = (ThreadInfo *)malloc(sizeof(ThreadInfo));
 
       param->start = j * iterationsPerThread;
-      param->end = j * (iterationsPerThread + 1);
+      param->end = (j+1) * (iterationsPerThread);
+      // param->start = 0;
+      // param->end = 19999;
 
       param->network = &networks.network[j];
       paramArray[j] = param;
@@ -124,13 +130,13 @@ int main()
     for (int nt = 0; nt < NUM_THREADS; nt++)
       s += paramArray[nt]->network->hiddenLayer.nodes[32].weights[0];
 
-    collect_av_parameters(paramArray, &final);
+    collect_av_parameters(paramArray);
     // for(int nt = 0; nt<NUM_THREADS; nt++)
     // testNetwork(paramArray[1]->network);
     // for(int nt = 0; nt<NUM_THREADS; nt++)
     // printf("\n\n weight:  %f,%f",*paramArray[0]->network->hiddenLayer.nodes[32].weights,s/12);
     // *paramArray[0]->network->hiddenLayer.nodes[1].weights+=*paramArray[0]->network->hiddenLayer.nodes[1].weights;
-    printf("\n\n weight: %f, %f", paramArray[0]->network->hiddenLayer.nodes[32].weights[0], s / 12);
+    // printf("\n\n weight: %f, %f", paramArray[0]->network->hiddenLayer.nodes[32].weights[0], s / 12);
     // paramArray[0]->network->hiddenLayer.nodes[1].weights[1] += 10;
     // printf("\n\n weight:  %f", paramArray[0]->network->hiddenLayer.nodes[1].weights[1]);
 
@@ -140,7 +146,7 @@ int main()
       ptr = paramArray[0]->network;
     }
     // networks.network[nt] = *paramArray[0]->network;
-    printf("\t after broadcast: %f\n", networks.network[0].hiddenLayer.nodes[32].weights[0]);
+    // printf("\t after broadcast: %f\n", networks.network[0].hiddenLayer.nodes[32].weights[0]);
 
     // networks.network[nt] = *paramArray[nt]->network;
     //   int h =0;
@@ -150,14 +156,14 @@ int main()
     // printf("\nnun empty number is :%d",h);
 
     //---------------------------------------------
-    testNetwork(paramArray[0]->network);
+    testNetwork( &networks.network[0]);
 
     // trainNetwork(&networks);
   }
   stop = getTime();
   double parallelTime = stop - start;
-  printf("\nParallel Implementation of NN\n");
-  printf("\nTime Elapsed=%f\n", parallelTime);
+  // printf("\nParallel Implementation of NN\n");
+  // printf("\nTime Elapsed=%f\n", parallelTime);
   // pthread_exit(NULL);
   return 0;
 }

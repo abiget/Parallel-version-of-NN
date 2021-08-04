@@ -1,8 +1,5 @@
 #include "dataLoader.h"
 #include "config.h"
-// #if !defined()
-// #include "../mnist.h"
-// #endif
 typedef struct Node_{
     double bias;
     double output;

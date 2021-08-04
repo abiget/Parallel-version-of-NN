@@ -1,4 +1,3 @@
-#include "dataLoader.h"
 #include "config.h"
 typedef struct Node_{
     double bias;

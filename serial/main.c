@@ -1,6 +1,6 @@
 #include "nn.h"
-#include<time.h>
 #include "mnist.h"
+#include <sys/time.h>
 
 
 double getTime()

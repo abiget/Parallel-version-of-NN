@@ -13,7 +13,7 @@ static void feedForwardLayer(Layer* previousLayer, Layer* layer);
 static void feedForward(Network* network, int img, int train);
 static void updateNode(Layer* previousLayer, double backPropValue, Node* node);
 static void backPropagate(Network* network, int label);
-static uint8_t getClassification(Layer* layer);
+static u_int8_t getClassification(Layer* layer);
 
 void initNetwork(Network* network){
     initLayer(IMAGE_SIZE, 0, &network->inputLayer);
@@ -33,7 +33,7 @@ void testNetwork(Network *network){
     for(int i=0; i<NUM_TEST; i++){
         feedForward(network, i, 0);
 
-        uint8_t classification = getClassification(&network->outputLayer);
+        u_int8_t classification = getClassification(&network->outputLayer);
         if (classification!=test_label[i]){
             errCount++;
         }
@@ -141,7 +141,7 @@ static void backPropagate(Network* network, int label){
     }
 }
 
-static uint8_t getClassification(Layer* layer){
+static u_int8_t getClassification(Layer* layer){
     double maxOutput = 0;
     int maxIndex = 0;
 
@@ -152,5 +152,5 @@ static uint8_t getClassification(Layer* layer){
             maxIndex = on;
         }
     }
-    return (uint8_t)maxIndex;
+    return (u_int8_t)maxIndex;
 }

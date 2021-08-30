@@ -28,14 +28,19 @@ int main()
     initNetwork(&network);
 
     testNetwork(&network);
+  printf("\n Serial Implementation:");
+  printf("\n\n\t========= Training Started ==========\n\n");
+
     // #pragma omp parallel for
     for(int i=0; i<TRAINING_EPOCHS; ++i){
-        printf("Training epoch %i/%i\n", i + 1, TRAINING_EPOCHS);
+        printf("Training epoch %i/%i: \t", i + 1, TRAINING_EPOCHS);
         trainNetwork(&network);
         testNetwork(&network);
     }
+  printf("\n\n\t========= Training Ended ==========\n\n");
+
     stop = getTime();
     double elapse=stop-start;
-    printf("\nTime Elapsed=%f",elapse );
+    printf("\nTime Elapsed=%f \n\n",elapse );
     return 0;
 }

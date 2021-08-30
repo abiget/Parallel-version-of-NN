@@ -51,16 +51,19 @@ int main()
   start = getTime();
   Networks networks;
   initNetworks(&networks);
+  printf("\nNumber of threads: %i\n",NUM_THREADS);
   testNetwork(&networks.network[0]); //will get back
+  printf("\n\n\t========= Training Started ==========\n\n");
+
+
 
   int iterationsPerThread = NUM_TRAIN / NUM_THREADS;
   pthread_t *threads = (pthread_t *)malloc(sizeof(pthread_t) * NUM_THREADS);
   ThreadInfo *paramArray[NUM_THREADS];
   int rc;
-
   for (int i = 0; i < 10; ++i)
   {
-    printf("Training epoch %i/%i \t:", i + 1, TRAINING_EPOCHS);
+    printf("Training epoch %i/%i: \t", i + 1, TRAINING_EPOCHS);
 
     for (int j = 0; j < NUM_THREADS; j++)
     {
@@ -102,10 +105,12 @@ int main()
     //---------------------------------------------Test the final network (i.e network[0])
     testNetwork( &networks.network[0]);
   }
+  printf("\n\n\t========= Training Ended ==========\n");
+
   stop = getTime();
   double parallelTime = stop - start;
   printf("\nParallel Implementation of NN\n");
-  printf("\nTime Elapsed=%f\n", parallelTime);
+  printf("\nTime Elapsed=%f seconds\n", parallelTime);
   pthread_exit(NULL);
   return 0;
 }
